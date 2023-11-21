@@ -1,1 +1,51 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+contract Crowdfunding {
+    address public projectCreator;
+    uint256 public fundingGoal;
+    uint256 public deadline;
+    IERC20 public token;
+    uint256 public totalFunding;
+    mapping(address => uint256) public contributions;
+    bool public fundingGoalReached;
+    bool public fundingClosed;
+
+    event FundingReceived(address indexed contributor, uint256 amount, uint256 totalFunding);
+    event FundingGoalReached(uint256 totalFunding);
+    event FundingClosed();
+
+    modifier onlyProjectCreator() {
+        require(msg.sender == projectCreator, "Only the project creator can call this function");
+        _;
+    }
+
+    modifier deadlineReached() {
+        require(block.timestamp >= deadline, "Deadline has not been reached");
+        _;
+    }
+
+    modifier fundingNotClosed() {
+        require(!fundingClosed, "Funding is closed");
+        _;
+    }
+
+    constructor(
+        address _projectCreator,
+        uint256 _fundingGoal,
+        uint256 _durationDays,
+        address _token
+    ) {
+        require(_projectCreator != address(0), "Invalid project creator address");
+        require(_fundingGoal > 0, "Funding goal must be greater than 0");
+
+        projectCreator = _projectCreator;
+        fundingGoal = _fundingGoal;
+        deadline = block.timestamp + (_durationDays * 1 days);
+        token = IERC20(_token);
+    }
+
+}
 
