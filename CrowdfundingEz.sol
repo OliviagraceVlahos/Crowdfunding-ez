@@ -63,5 +63,22 @@ function checkFundingGoalReached() internal {
             emit FundingGoalReached(totalFunding);
         }
     }
+function closeFunding() external onlyProjectCreator fundingNotClosed deadlineReached {
+        fundingClosed = true;
+
+        if (fundingGoalReached) {
+            // Transfer funds to the project creator
+            require(token.transfer(projectCreator, totalFunding), "Token transfer failed");
+        }
+
+        emit FundingClosed();
+    }
+
+    function refundContribution() external fundingNotClosed deadlineReached {
+        require(!fundingGoalReached, "Funding goal has been reached");
+        uint256 amountToRefund = contributions[msg.sender];
+        contributions[msg.sender] = 0;
+        require(token.transfer(msg.sender, amountToRefund), "Token transfer failed");
+    }
 }
 
