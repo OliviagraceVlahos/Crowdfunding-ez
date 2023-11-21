@@ -46,6 +46,16 @@ contract Crowdfunding {
         deadline = block.timestamp + (_durationDays * 1 days);
         token = IERC20(_token);
     }
+function contribute(uint256 _amount) external fundingNotClosed {
+        require(_amount > 0, "Contribution must be greater than 0");
+        require(token.transferFrom(msg.sender, address(this), _amount), "Token transfer failed");
 
+        contributions[msg.sender] += _amount;
+        totalFunding += _amount;
+
+        emit FundingReceived(msg.sender, _amount, totalFunding);
+
+        checkFundingGoalReached();
+    }
 }
 
