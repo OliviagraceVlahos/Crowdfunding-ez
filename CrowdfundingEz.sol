@@ -57,5 +57,11 @@ function contribute(uint256 _amount) external fundingNotClosed {
 
         checkFundingGoalReached();
     }
+function checkFundingGoalReached() internal {
+        if (totalFunding >= fundingGoal && !fundingGoalReached) {
+            fundingGoalReached = true;
+            emit FundingGoalReached(totalFunding);
+        }
+    }
 }
 
